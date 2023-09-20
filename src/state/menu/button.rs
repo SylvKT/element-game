@@ -1,5 +1,6 @@
 use std::ops::Mul;
 use bevy::prelude::*;
+use crate::menu::DISABLED_BUTTON;
 use crate::state::menu::{HOVERED_BUTTON, NORMAL_BUTTON};
 
 #[derive(Component)]
@@ -101,14 +102,27 @@ pub struct PreviousButtonProperties {
 	pub previous_bottom_padding: PreviousButtonBottomPadding,
 }
 
+/// Disables the button if true.
+#[derive(Component, Copy, Clone, Default)]
+pub struct DisabledButton(pub bool);
+
 /// Handles button style
 pub fn style(
 	mut interaction_query: Query<
-		(&Interaction, &mut PreviousButtonInteraction, &mut UiColor, &ButtonColor, &mut UiImage, &ButtonUpImage, &ButtonDownImage, &mut Style, &mut PreviousButtonBottomPadding),
+		(&Interaction, &mut PreviousButtonInteraction, &mut UiColor, &ButtonColor, &mut UiImage, &ButtonUpImage, &ButtonDownImage, &mut Style, &mut PreviousButtonBottomPadding, &DisabledButton),
 		(Changed<Interaction>, With<Button>),
 	>,
 ) {
-	for (interaction, mut previous_interaction, mut color, button_color, mut image, button_up, button_down, mut style, mut previous_bottom_padding) in interaction_query.iter_mut() {
+	for (interaction, mut previous_interaction, mut color, button_color, mut image, button_up, button_down, mut style, mut previous_bottom_padding, &disabled) in interaction_query.iter_mut() {
+		if disabled.0 {
+			*color = (button_color * &DISABLED_BUTTON.into()).into();
+			*image = button_down.0.clone_weak().into();
+			*previous_interaction = Interaction::None.into();
+			*previous_bottom_padding = style.padding.bottom.into();
+			style.padding.bottom = Val::Px(0.0);
+			return
+		}
+		
 		match *interaction {
 			Interaction::Clicked => {
 				*color = (button_color * &HOVERED_BUTTON.into()).into();

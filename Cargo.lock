@@ -888,26 +888,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0d8c1fef690941d3e7788d328517591fecc684c084084702d6ff1641e993699a"
 
 [[package]]
-name = "botanica"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "bevy",
- "bevy_egui",
- "bevy_renet",
- "bincode",
- "futures",
- "iyes_loopless",
- "rand",
- "regex",
- "renet",
- "renet_visualizer",
- "ron",
- "rsa",
- "serde",
-]
-
-[[package]]
 name = "bumpalo"
 version = "3.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1461,6 +1441,26 @@ dependencies = [
  "ahash",
  "epaint",
  "nohash-hasher",
+]
+
+[[package]]
+name = "element-game"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "bevy",
+ "bevy_egui",
+ "bevy_renet",
+ "bincode",
+ "futures",
+ "iyes_loopless",
+ "rand",
+ "regex",
+ "renet",
+ "renet_visualizer",
+ "ron",
+ "rsa",
+ "serde",
 ]
 
 [[package]]

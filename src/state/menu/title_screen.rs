@@ -6,8 +6,8 @@ use bevy::app::AppExit;
 use bevy::prelude::*;
 use iyes_loopless::prelude::*;
 use crate::{asset, DEFAULT_LOCALE, despawn_with, from_asset_loc, GameState, LocaleAsset, menu, NAMESPACE, Translatable};
-use crate::menu::{BUTTON_HEIGHT, BUTTON_SCALE, BUTTON_BOTTOM_PADDING, BUTTON_WIDTH, BUTTON_TEXT_SIZE};
-use crate::menu::button::{PreviousButtonInteraction, PreviousButtonProperties};
+use crate::menu::{BUTTON_HEIGHT, BUTTON_SCALE, BUTTON_BOTTOM_PADDING, BUTTON_WIDTH, BUTTON_TEXT_SIZE, DISABLED_BUTTON};
+use crate::menu::button::{DisabledButton, PreviousButtonInteraction, PreviousButtonProperties};
 use crate::state::menu::{BACKGROUND, BLUE_BUTTON, NORMAL_BUTTON, RED_BUTTON, TEXT_MARGIN};
 use crate::state::menu::button::{ButtonColor, ButtonDownImage, ButtonImageBundle, ButtonUpImage};
 
@@ -133,6 +133,53 @@ fn setup(
 					}
 				)
 				.with_children(|parent| {
+					// singleplayer button
+					parent
+						.spawn_bundle(
+							ButtonBundle {
+								style: Style {
+									size: button_size,
+									margin: button_margin,
+									justify_content,
+									align_items,
+									padding: button_padding,
+									..default()
+								},
+								..default()
+							}
+						)
+						.insert(ButtonColor(NORMAL_BUTTON))
+						.insert_bundle(button_image_bundle.clone())
+						.insert_bundle(PreviousButtonProperties::default())
+						.insert(DisabledButton(false))
+						.insert(ButtonAction::Singleplayer)
+						.with_children(|parent| {
+							parent
+								.spawn_bundle(
+									TextBundle {
+										style: Style {
+											margin: Rect::all(TEXT_MARGIN),
+											..default()
+										},
+										text: Text::with_section(
+											Translatable::translate_once(
+												asset::namespaced(NAMESPACE, "ui.title_screen.button.singleplayer").as_str(),
+												DEFAULT_LOCALE,
+												&asset_server,
+												&locale_assets,
+											),
+											TextStyle {
+												font: monogram.clone(),
+												font_size: BUTTON_TEXT_SIZE,
+												color: Color::BLACK,
+											},
+											default()
+										),
+										..default()
+									}
+								);
+						});
+					
 					// multiplayer button
 					parent
 						.spawn_bundle(
@@ -151,6 +198,7 @@ fn setup(
 						.insert(ButtonColor(NORMAL_BUTTON))
 						.insert_bundle(button_image_bundle.clone())
 						.insert_bundle(PreviousButtonProperties::default())
+						.insert(DisabledButton(true))
 						.insert(ButtonAction::Multiplayer)
 						.with_children(|parent| {
 							parent
@@ -170,7 +218,7 @@ fn setup(
 											TextStyle {
 												font: monogram.clone(),
 												font_size: BUTTON_TEXT_SIZE,
-												color: Color::BLACK,
+												color: Color::DARK_GRAY,
 											},
 											default()
 										),
@@ -197,6 +245,7 @@ fn setup(
 						.insert(ButtonColor(NORMAL_BUTTON))
 						.insert_bundle(button_image_bundle.clone())
 						.insert_bundle(PreviousButtonProperties::default())
+						.insert(DisabledButton(false))
 						.insert(ButtonAction::Quit)
 						.with_children(|parent| {
 							parent
@@ -228,6 +277,7 @@ fn setup(
 		});
 }
 
+/// Handles actions done to buttons
 fn button_action(
 	interaction_query: Query<
 		(&Interaction, &PreviousButtonInteraction, &ButtonAction),
@@ -240,7 +290,7 @@ fn button_action(
 		// only execute action if still hovering after click ends
 		if *interaction == Interaction::Hovered && *previous_interaction == Interaction::Clicked.into() {
 			match button_action {
-				// ButtonAction::Singleplayer => commands.insert_resource(NextState(GameState::WorldSelect)), // todo: singleplayer
+				ButtonAction::Singleplayer => commands.insert_resource(NextState(GameState::WorldSelect)),
 				ButtonAction::Multiplayer => commands.insert_resource(NextState(GameState::ServerSelect)),
 				ButtonAction::Quit => app_exit_events.send(AppExit),
 				_ => unimplemented!("{}", button_action),

@@ -8,7 +8,7 @@ const BEVY_SPLASH_TIME: f32 = {
 	#[cfg(feature = "fast_bevy_splash")]
 	{ 1.0 }
 	#[cfg(not(feature = "fast_bevy_splash"))]
-	{ 5.0 } // don't be sad, i just really love bevy!
+	{ 2.0 } // don't be sad, i just really love bevy!
 };
 
 pub struct BevySplashPlugin;

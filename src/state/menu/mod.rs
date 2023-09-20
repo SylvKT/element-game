@@ -15,6 +15,7 @@ use crate::{from_asset_loc, load_asset_bytes, NAMESPACE};
 const TEXT_MARGIN: Val = Val::Px(5.0);
 
 const NORMAL_BUTTON: Color = Color::rgb(1.0, 1.0, 1.0);
+const DISABLED_BUTTON: Color = Color::rgb(0.85, 0.85, 0.85);
 const HOVERED_BUTTON: Color = Color::rgb(0.75, 0.75, 0.75);
 
 const WHITE_BUTTON: Color = NORMAL_BUTTON;

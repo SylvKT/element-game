@@ -15,10 +15,9 @@
 	"ui.world_select.button.cancel": "Cancel",
 
 	// Blocks
-	"tile.name.dirt": "Dirt",
-	"tile.name.grass": "Grass",
-	"tile.name.grass_plant": "Grass",
-	"tile.name.stone": "Stone",
+	"block.name.dirt": "Dirt",
+	"block.name.grass": "Grass",
+	"block.name.stone": "Stone",
 
 	// Items
 	//  Seeds

@@ -27,7 +27,7 @@ impl TryFrom<String> for EnvType {
 	type Error = EnvTypeFromStringError;
 	
 	fn try_from(value: String) -> Result<Self, Self::Error> {
-		match value.as_str() {
+		match value.to_lowercase().as_str() {
 			"client" => Ok(EnvType::Client),
 			"server" => Ok(EnvType::Server),
 			_ => Err(EnvTypeFromStringError(value)),

@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use crate::creature::Creature;
 use crate::networking::protocol::ClientId;
-use crate::Position;
+use crate::position::*;
 
 #[derive(Debug, Default, Clone, Component)]
 pub struct Player;

@@ -1,6 +1,6 @@
 use std::fmt::{Debug, Display, Formatter};
 
-#[derive(Copy, Clone, Hash, PartialEq, Eq)]
+#[derive(Clone, Hash, PartialEq, Eq)]
 pub struct Identifier<'a> {
 	namespace: &'a str,
 	id: &'a str,
@@ -20,6 +20,12 @@ impl<'a> Identifier<'a> {
 
 	pub fn id(&self) -> &str {
 		self.id
+	}
+}
+
+impl<'a> Default for Identifier<'a> {
+	fn default() -> Self {
+		Identifier::new(crate::NAMESPACE, "null")
 	}
 }
 

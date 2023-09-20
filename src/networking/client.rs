@@ -24,15 +24,15 @@ impl Plugin for NetworkingPlugin {
 				setup
 					.run_if(env::is_client)
 			)
-			.add_system(
-				client
-					.run_in_state(GameState::WorldSelect)
-					.run_in_state(GameState::LoadingWorld)
-					.run_in_state(GameState::InWorld)
-					.run_if(env::is_client)
-			)
-			.add_system(server_message)
-			.add_system(server_response);
+			.add_system_set(ConditionSet::new()
+				.run_in_state(GameState::LoadingWorld)
+				.run_in_state(GameState::InWorld)
+				.run_if(env::is_client)
+				.with_system(client)
+				.with_system(server_message)
+				.with_system(server_response)
+				.into()
+			);
 	}
 }
 
@@ -134,7 +134,9 @@ fn server_message(
 				println!("Disconnected.\nReason: {:?}", reason);
 				client.disconnect();
 			}
-			ServerMessage::PlayerJoin()
+			ServerMessage::PlayerJoin(id, data) => {
+				println!("{} joined the game", &data.username);
+			}
 			_ => {}
 		}
 	}
@@ -143,7 +145,6 @@ fn server_message(
 fn server_response(
 	response_query: Query<&ServerResponse>,
 	mut commands: Commands,
-	mut world: ResMut<World>,
 	mut time: ResMut<Time>,
 ) {
 	time.update();
@@ -152,7 +153,7 @@ fn server_response(
 		match response {
 			ServerResponse::PingAck { timestamp } => {
 				let ping = (time.time_since_startup().as_millis() - timestamp) as u32;
-				world.insert_resource(Ping(ping));
+				commands.insert_resource(Ping(ping));
 			}
 			ServerResponse::EnterWorldAccept => commands.insert_resource(NextState(GameState::LoadingWorld)),
 			ServerResponse::EnterWorldDeny(reason) => println!("Failed to enter world.\nReason: {:?}", reason),

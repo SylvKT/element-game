@@ -1,7 +1,8 @@
 use serde::{Deserialize, Serialize};
 use bevy::prelude::*;
-use crate::{TilePos, Username};
+use crate::Username;
 use crate::player::{Source, Target};
+use crate::position::*;
 
 pub const PROTOCOL_ID: u64 = 0x460709E200F3661E;
 pub const PROTOCOL_VER: u32 = 0;
@@ -15,8 +16,8 @@ pub enum Message {
 	ClientResponse(ClientResponse),
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash, Component)]
 /// A message that the server sends to a client (or to all/some clients).
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash, Component)]
 pub enum ServerMessage {
 	Ping {
 		/// The time the ping was sent.
@@ -29,11 +30,11 @@ pub enum ServerMessage {
 	/// A request from a player to change their display name (nickname).
 	PlayerNick(ClientId, String),
 	ChatMessage(ChatMessageBundle),
-	PlayerPosition(ClientId, TilePos),
+	PlayerPosition(ClientId, Position),
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash, Component)]
 /// A message that the server sends to a client in response to a message from that client.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash, Component)]
 pub enum ServerResponse {
 	Query {
 		/// The protocol version.
@@ -52,8 +53,8 @@ pub enum ServerResponse {
 	EnterWorldAccept,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash, Component)]
 /// A message that the client sends to the server.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash, Component)]
 pub enum ClientMessage {
 	Query,
 	Ping {
@@ -63,7 +64,7 @@ pub enum ClientMessage {
 	JoinRequest,
 	ChatMessage(Target, String),
 	EnterWorldRequest(String),
-	PlayerPosition(TilePos),
+	PlayerPosition(Position),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash, Bundle)]
@@ -72,8 +73,8 @@ pub struct ClientMessageBundle {
 	pub message: ClientMessage,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash, Component)]
 /// A message that the client sends to the server in response to a message the server sent.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash, Component)]
 pub enum ClientResponse {
 	QueryAck,
 	PingAck {

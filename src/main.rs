@@ -1,6 +1,6 @@
 pub mod registry;
 pub mod identifier;
-pub mod tile;
+pub mod block;
 pub mod raw_id;
 pub mod asset;
 pub mod i18n;
@@ -10,7 +10,12 @@ pub mod util;
 pub mod player;
 pub mod world;
 pub mod creature;
-mod state;
+pub mod state;
+pub mod element;
+pub mod position;
+/// Defines palettes which compress repetitive data by mapping data to integers.
+/// This is useful for saving chunk data.
+pub mod palette;
 
 use std::any::TypeId;
 use bevy::asset::{AssetIo, AssetIoError};
@@ -25,7 +30,7 @@ use crate::env::EnvType;
 use crate::i18n::Translatable;
 use crate::identifier::Identifier;
 use crate::registry::Registry;
-use crate::registry::tile::TileRegistry;
+use crate::registry::element::ElementRegistry;
 use state::*;
 use crate::networking::debug::NetworkingDebugPlugin;
 use crate::networking::{client, server, Username};
@@ -51,6 +56,7 @@ impl Default for ServerAddressPort {
 	}
 }
 
+/// If we are in headless mode
 pub fn is_headless(headless: Res<Headless>) -> bool {
 	headless.0
 }
@@ -62,19 +68,17 @@ pub enum GameState {
 	BevySplash,
 	TitleScreen,
 	ServerSelect,
+	/// The state in which the client is connecting to the server.
 	ClientConnecting, // todo: client connecting screen
+	/// World selection screen
 	WorldSelect,
+	/// Loading the world
 	LoadingWorld,
+	/// In the world
 	InWorld,
 	ServerLoading,
 	ServerLoaded,
 }
-
-#[derive(Debug, Copy, Clone, Serialize, Deserialize, PartialEq, Eq, Hash, Component)]
-pub struct TilePos(pub u64, pub u64);
-
-#[derive(Debug, Copy, Clone, Serialize, Deserialize, PartialEq, Component)]
-pub struct Position(pub f64, pub f64);
 
 pub fn main() {
 	let env = EnvType::try_from(std::env::var("ENVIRONMENT").unwrap_or("client".to_string())).unwrap(); // todo: force EnvType environment variable
@@ -90,7 +94,7 @@ pub fn main() {
 		.insert_resource(env)
 		.insert_resource(headless)
 		.init_resource::<loading::AssetsLoading>()
-		.init_resource::<TileRegistry>() // todo: tile registry and other registries
+		.init_resource::<ElementRegistry>() // todo: element registry and other registries
 		.add_asset::<LocaleAsset>()
 		.init_asset_loader::<LocaleAssetLoader>()
 		.add_startup_system(
@@ -127,6 +131,7 @@ pub fn despawn_with<T: Component>(
 	}
 }
 
+/// Are we in debug mode?
 pub fn is_debug() -> bool {
 	#[cfg(feature = "debug")]
 	return true;
@@ -174,6 +179,7 @@ pub unsafe fn mut_component_for_entity<'a, C>(
 	component
 }
 
+/// Gets a component of type `C` for an entity.
 pub fn component_for_entity<'a, C>(
 	entity: &Entity,
 	world: &World,

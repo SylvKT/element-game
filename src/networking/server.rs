@@ -11,7 +11,7 @@ use crate::{env, GameState, mut_component_for_entity, Username, util};
 use crate::networking::{Ping, protocol, strip_formatting};
 use crate::networking::protocol::{ChatMessageBundle, ChatMessageContent, ClientId, ClientMessage, ClientMessageBundle, ClientResponse, ClientResponseBundle, PlayerData};
 use crate::player::{Source, Target};
-use crate::world::{WorldId, Worlds};
+use crate::world::{GameWorldId, GameWorlds};
 
 pub struct NetworkingPlugin;
 
@@ -69,7 +69,7 @@ impl Default for ServerConfig {
 }
 
 #[derive(Debug, Default, Clone)]
-pub struct Players(pub HashMap<u64, (PlayerData, Option<WorldId>, Option<&'static Entity>)>);
+pub struct Players(pub HashMap<u64, (PlayerData, Option<GameWorldId>, Option<&'static Entity>)>);
 
 #[derive(Debug, Copy, Clone, Serialize, Deserialize, PartialEq, Eq, Hash, Component)]
 pub struct ServerPing(pub Ping);
@@ -155,7 +155,7 @@ fn server(
 fn client_message(
 	message_query: Query<(&ClientId, &ClientMessage)>,
 	mut server: ResMut<RenetServer>,
-	mut worlds: ResMut<Worlds>,
+	mut game_worlds: ResMut<GameWorlds>,
 	mut players: ResMut<Players>,
 ) {
 	for (client_id, message) in message_query.iter() {
@@ -193,7 +193,7 @@ fn client_response(
 	mut commands: Commands,
 	mut world: ResMut<World>,
 	mut time: ResMut<Time>,
-	mut worlds: ResMut<Worlds>,
+	mut worlds: ResMut<GameWorlds>,
 	mut players: ResMut<Players>,
 ) {
 	time.update();
